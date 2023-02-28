@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "serial_worker.hpp"
 
-SerialWorker::SerialWorker(uint16_t baud_rate, std::function<void(SerialCommand)> command_cb) {
+SerialWorker::SerialWorker(uint16_t baud_rate, std::function<void(SerialCommand*)> command_cb) {
     command_cb_ = command_cb;
     Serial.begin(baud_rate);
 }
@@ -51,20 +51,21 @@ long SerialWorker::find_delay_argument() {
     return atol(strtok_idx);
 }
 
-SerialCommand SerialWorker::parse_cmd_() {
-    SerialCommand cmd = SerialCommand { SerialCommandType::NONE, -1};
-    
+SerialCommand* SerialWorker::parse_cmd_() {
+    SerialCommand* cmd = new SerialCommand();
+    cmd->command_type = SerialCommandType::NONE;
+
     if (strncmp(pwr_off_cmd_, temp_chars_, 7) == 0) {
 
         // parse power off command
-        cmd.command_type = SerialCommandType::POWER_OFF;
+        cmd->command_type = SerialCommandType::POWER_OFF;
     } else if (strncmp(pwr_on_cmd_, temp_chars_, 7) == 0) {
 
         // parse power on command
-        cmd.command_type = SerialCommandType::POWER_ON;
+        cmd->command_type = SerialCommandType::POWER_ON;
     }
 
-    cmd.command_arg = find_delay_argument();
+    cmd->command_arg = find_delay_argument();
     return cmd;
 }
 
@@ -72,8 +73,8 @@ void SerialWorker::loop() {
     receive_data_();
     if (new_data_) {
         strcpy(temp_chars_, received_chars_);
-        SerialCommand command = parse_cmd_();
-        if (command.command_type != SerialCommandType::NONE) {
+        SerialCommand* command = parse_cmd_();
+        if (command->command_type != SerialCommandType::NONE) {
             command_cb_(command);
         }
         new_data_ = false;

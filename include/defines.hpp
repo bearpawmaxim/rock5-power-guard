@@ -21,7 +21,10 @@ enum SerialCommandType: uint8_t {
     DEEP_SLEEP = 4
 };
 
-struct SerialCommand {
-    uint8_t command_type;
-    int32_t command_arg;
+class SerialCommand {
+    public:
+        SerialCommand() {}
+        SerialCommand(uint8_t commandType, ulong commandArg) { this->command_type = commandType; this->command_arg = commandArg; }
+        uint8_t command_type;
+        ulong command_arg;
 };

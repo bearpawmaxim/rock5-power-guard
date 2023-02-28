@@ -7,7 +7,7 @@ using namespace std;
 
 class SerialWorker {
     public:
-        SerialWorker(uint16_t baud_rate, std::function<void(SerialCommand)> command_cb);
+        SerialWorker(uint16_t baud_rate, std::function<void(SerialCommand*)> command_cb);
         void report_state(uint8_t state);
         void loop();
 
@@ -18,9 +18,9 @@ class SerialWorker {
         char received_chars_[SERIAL_BUFF_SIZE];
         char temp_chars_[SERIAL_BUFF_SIZE];
         char response_chars_[SERIAL_BUFF_SIZE];
-        std::function<void(SerialCommand)> command_cb_;
+        std::function<void(SerialCommand*)> command_cb_;
         void receive_data_();
         long find_delay_argument();
-        SerialCommand parse_cmd_();
+        SerialCommand* parse_cmd_();
 
 };
